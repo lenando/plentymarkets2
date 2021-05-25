@@ -579,7 +579,7 @@ class lenandoDE extends CSVPluginGenerator
 	    
 	    foreach($variation['data']['unit']['names'] as $unitnames){
         	
-        	if($unitnames['lang'] === 'de'){
+        	if($unitnames['lang'] == 'de'){
         		
         		return $unitnames['name'];
         			
