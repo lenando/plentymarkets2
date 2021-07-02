@@ -1,5 +1,13 @@
 # Release Notes für Elastic Export lenando.de
 
+## v1.0.17 (2021-07-02)
+### geändert
+- Units wieder auf feste ID's umstellen.
+
+## v1.0.16 (2021-07-02)
+### geändert
+- Logs wurden angepasst.
+
 ## v1.0.15 (2021-05-27)
 ### geändert
 - Logs wurden angepasst.
