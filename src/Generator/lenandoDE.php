@@ -408,95 +408,79 @@ class lenandoDE extends CSVPluginGenerator
             $effizienzklasse = str_replace("8", "E",$effizienzklasse);
             $effizienzklasse = str_replace("9", "F",$effizienzklasse);
             $effizienzklasse = str_replace("10", "G",$effizienzklasse);
-		
-		
-		
-	$priceList = $this->elasticExportPriceHelper->getPriceList($variation, $settings, 2, '.');
-        $basePriceData = $this->elasticExportPriceHelper->getBasePriceDetails($variation, (float) $priceList['price'], $settings->get('lang'));
-       
-		
-		
-		if($this->getUnit((string)$basePriceData['unitLongName']) !== ''){
-		
-			$unitName = $this->getUnit($basePriceData['unitLongName']);
-			$unitContent = number_format((float)$variation['data']['unit']['content'],3,',','');
-			
-		}else{
-		
-			$unitName = '';
-			$unitContent = '';
-			
-		}
-     
+            
+            $basePriceComponentList = $this->getBasePriceComponentList($variation);
+            
+           
             
             $data = [
-            		'Produktname'			=> $this->elasticExportHelper->getMutatedName($variation, $settings),
+            'Produktname'			=> $this->elasticExportHelper->getMutatedName($variation, $settings),
 			'Artikelnummer'			=> $variation['data']['variation']['number'],
-			'ean'				=> $this->elasticExportHelper->getBarcodeByType($variation, $settings->get('barcode')),
+			'ean'					=> $this->elasticExportHelper->getBarcodeByType($variation, $settings->get('barcode')),
 			'Hersteller'			=> $manufacturer,
 			'Steuersatz'			=> $priceList['vatValue'],
-			'Preis'				=> $priceList['price'],
+			'Preis'					=> $priceList['price'],
 			'Kurzbeschreibung'		=> $this->elasticExportHelper->getMutatedPreviewText($variation, $settings),
 			'Beschreibung'			=> $this->elasticExportHelper->getMutatedDescription($variation, $settings) . ' ' . $this->propertyHelper->getPropertyListDescription($variation, $settings->get('lang')),
 			'Versandkosten'			=> $shippingCost,
 			'Lagerbestand'			=> $this->stockHelper->getStock($variation),
 			'Kategoriestruktur'		=> $this->elasticExportHelper->getCategory((int)$variation['data']['defaultCategories'][0]['id'], (string)$settings->get('lang'), (int)$settings->get('plentyId')),
-			'Attribute'			=> '',
-			'Gewicht'			=> $variation['data']['variation']['weightG'],
+			'Attribute'				=> '',
+			'Gewicht'				=> $variation['data']['variation']['weightG'],
 			'Lieferzeit'			=> $this->elasticExportHelper->getAvailability($variation, $settings),
 			'Nachnahmegebühr'		=> '',
-			'MPN'				=> $variation['data']['variation']['model'],
-			'Bildlink'			=> count($imageList) > 0 && array_key_exists(0, $imageList) ? $imageList[0] : '',
-			'Bildlink2'			=> count($imageList) > 0 && array_key_exists(1, $imageList) ? $imageList[1] : '',
-			'Bildlink3'			=> count($imageList) > 0 && array_key_exists(2, $imageList) ? $imageList[2] : '',
-			'Bildlink4'			=> count($imageList) > 0 && array_key_exists(3, $imageList) ? $imageList[3] : '',
-			'Bildlink5'			=> count($imageList) > 0 && array_key_exists(4, $imageList) ? $imageList[4] : '',
-			'Bildlink6'			=> count($imageList) > 0 && array_key_exists(5, $imageList) ? $imageList[5] : '',
-			'Zustand'			=> $zustand,
+			'MPN'					=> $variation['data']['variation']['model'],
+			'Bildlink'				=> count($imageList) > 0 && array_key_exists(0, $imageList) ? $imageList[0] : '',
+			'Bildlink2'				=> count($imageList) > 0 && array_key_exists(1, $imageList) ? $imageList[1] : '',
+			'Bildlink3'				=> count($imageList) > 0 && array_key_exists(2, $imageList) ? $imageList[2] : '',
+			'Bildlink4'				=> count($imageList) > 0 && array_key_exists(3, $imageList) ? $imageList[3] : '',
+			'Bildlink5'				=> count($imageList) > 0 && array_key_exists(4, $imageList) ? $imageList[4] : '',
+			'Bildlink6'				=> count($imageList) > 0 && array_key_exists(5, $imageList) ? $imageList[5] : '',
+			'Zustand'				=> $zustand,
 			'Familienname1'			=> '',
 			'Eigenschaft1'			=> '',
 			'Familienname2'			=> '',
 			'Eigenschaft2'			=> '',
-			'ID'				=> $variation['id'],
-			'Einheit'			=> $unitName,
-			'Inhalt'			=> $unitContent,
-			'Freifeld1'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 1),
-			'Freifeld2'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 2),
-			'Freifeld3'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 3),
-			'Freifeld4'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 4),
-			'Freifeld5'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 5),
-			'Freifeld6'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 6),
-			'Freifeld7'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 7),
-			'Freifeld8'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 8),
-			'Freifeld9'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 9),
+			'ID'					=> $variation['id'],
+			'Einheit'				=> $basePriceComponentList['unit'], //$unit,
+			'Inhalt'				=> strlen($basePriceComponentList['unit']) ? number_format((float)$basePriceComponentList['content'],3,',','') : '', //$basePriceList['lot'],
+			'Freifeld1'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 1),
+			'Freifeld2'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 2),
+			'Freifeld3'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 3),
+			'Freifeld4'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 4),
+			'Freifeld5'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 5),
+			'Freifeld6'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 6),
+			'Freifeld7'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 7),
+			'Freifeld8'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 8),
+			'Freifeld9'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 9),
 			'Freifeld10'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 10),
-			'baseid'			=> 'BASE-'.$variation['data']['item']['id'],
-			'basename'			=> $attributenliste,
-			'level'				=> '0',
-			'status'			=> $this->getStatus($variation),
-			'external_categories'		=> '',
-			'base'				=> '3',
+			'baseid'				=> 'BASE-'.$variation['data']['item']['id'],
+			'basename'				=> $attributenliste,
+			'level'					=> '0',
+			'status'				=> $this->getStatus($variation),
+			'external_categories'	=> '',
+			'base'					=> '3',
 			'dealer_price'			=> '',
-			'link'				=> '',
-			'ASIN'				=> '',
+			'link'					=> '',
+			'ASIN'					=> '',
 			'Mindestabnahme'		=> '',
 			'Maximalabnahme'		=> '',
 			'Abnahmestaffelung'		=> '',
 			'Energieefiizienz'		=> $effizienzklasse,
-			'Energieefiizienzbild'		=> '',
-			'UVP'				=> $priceList['recommendedRetailPrice'],
-			'EVP'				=> '',
-		    	'Grundpreis'			=> '',
-		    	'Freifeld11'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 11),
-		    	'Freifeld12'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 12),
-		    	'Freifeld13'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 13),
-		    	'Freifeld14'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 14),
-		    	'Freifeld15'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 15),
-		    	'Freifeld16'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 16),
-		    	'Freifeld17'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 17),
-		    	'Freifeld18'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 18),
-		    	'Freifeld19'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 19),
-		    	'Freifeld20'			=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 20),
+			'Energieefiizienzbild'	=> '',
+			'UVP'					=> $priceList['recommendedRetailPrice'],
+			'EVP'					=> '',
+		    	'Grundpreis'				=> '',
+		    	'Freifeld11'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 11),
+		    	'Freifeld12'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 12),
+		    	'Freifeld13'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 13),
+		    	'Freifeld14'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 14),
+		    	'Freifeld15'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 15),
+		    	'Freifeld16'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 16),
+		    	'Freifeld17'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 17),
+		    	'Freifeld18'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 18),
+		    	'Freifeld19'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 19),
+		    	'Freifeld20'				=> $this->elasticExportItemHelper->getFreeFields($variation['data']['item']['id'], 20),
             ];
             $this->addCSVContent(array_values($data));
             $this->getLogger(__METHOD__)->debug('ElasticExportlenandoDE::log.variationConstructRowFinished', [
@@ -559,50 +543,147 @@ class lenandoDE extends CSVPluginGenerator
     // NEU
     
     
-    
+    /**
+     * Get necessary components to enable Rakuten to calculate a base price for the variation
+     * @param array $item
+     * @return array
+     */
+    private function getBasePriceComponentList($variation):array
+    {
+        $unit = $this->getUnit($variation);
+        $content = (float)$variation['data']['unit']['content'];
+        $convertBasePriceContentTag = $this->elasticExportHelper->getConvertContentTag($content, 3);
+        if ($convertBasePriceContentTag == true && strlen($unit))
+        {
+            $content = $this->elasticExportHelper->getConvertedBasePriceContent($content, $unit);
+            $unit = $this->elasticExportHelper->getConvertedBasePriceUnit($unit);
+        }
+        return array(
+            'content'   =>  $content,
+            'unit'      =>  $unit,
+        );
+    }
     
     
 /**
-     * Returns the unitname sometimes in short Text
+     * Returns the unit, if there is any unit configured, which is allowed
+     * for the Rakuten.de API.
      *
      * @param  array   $item
      * @return string
      */
-    private function getUnit($unitname):string
+    private function getUnit($variation):string
     {
-        
-	switch($unitname)
+        switch((int) $variation['data']['unit']['id'])
         {
-			case 'Kilogramm':
+            case '1':
+				return 'Stück';
+			case '2':
 				return 'kg';
-			case 'Gramm':
+			case '3':
 				return 'g';
-			case 'Milligramm':
+			case '4':
 				return 'mg';
-			case 'Liter':
+			case '5':
 				return 'l';
-			case 'Meter':
+			case '6':
+				return '12 Stück';
+			case '7':
+				return '2er Pack';
+			case '8':
+				return 'Ballen';
+			case '9':
+				return 'Behälter';
+			case '10':
+				return 'Beutel';
+			case '11':
+				return 'Blatt';
+			case '12':
+				return 'Block';
+			case '13':
+				return 'Block';
+			case '14':
+				return 'Bogen';
+			case '15':
+				return 'Box';
+			case '16':
+				return 'Bund';
+			case '17':
+				return 'Container';
+			case '18':
+				return 'Dose';
+			case '19':
+				return 'Dose/Büchse';
+			case '20':
+				return 'Dutzend';
+			case '21':
+				return 'Eimer';
+			case '22':
+				return 'Etui';
+			case '23':
+				return 'Fass';
+			case '24':
+				return 'Flasche';
+			case '25':
+				return 'Flüssigunze';
+			case '26':
+				return 'Glas/Gefäß';
+			case '27':
+				return 'Karton';
+			case '28':
+				return 'Kartonage';
+			case '29':
+				return 'Kit';
+			case '30':
+				return 'Knäuel';
+			case '31':
 				return 'm';
-			case 'Milliliter':
+			case '32':
 				return 'ml';
-			case 'Millimeter':
+			case '33':
 				return 'mm';
-			case 'Quadratmeter':
+			case '34':
+				return 'Paar';
+			case '35':
+				return 'Päckchen';
+			case '36':
+				return 'Paket';
+			case '37':
+				return 'Palette';
+			case '38':
 				return 'm²';
-			case 'Quadratzentimeter':
+			case '39':
 				return 'cm²';
-			case 'Quadratmillimeter':
+			case '40':
 				return 'mm²';
-			case 'Quadratzentimeter':
+			case '41':
 				return 'cm²';
-			case 'Quadratmillimeter':
+			case '42':
 				return 'mm²';
-			case 'Zentimeter':
+			case '43':
+				return 'Rolle';
+			case '44':
+				return 'Sack';
+			case '45':
+				return 'Satz';
+			case '46':
+				return 'Spule';
+			case '47':
+				return 'Stück';
+			case '48':
+				return 'Tube/Rohr';
+			case '49':
+				return 'Unze';
+			case '50':
+				return 'Wascheinheit';
+			case '51':
 				return 'cm';
+			case '52':
+				return 'Zoll';
+			
 			default:
-				return $unitname;
+				return '';
         }
-	
     }
     /**
      * Get the item value for the store special flag.
