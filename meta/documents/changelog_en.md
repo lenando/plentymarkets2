@@ -1,5 +1,13 @@
 # Release Notes for Elastic Export lenando.de
 
+## v1.0.17 (2021-07-02)
+### geändert
+- Units change to ID's again.
+
+## v1.0.16 (2021-07-02)
+### Changed
+- change Logs
+
 ## v1.0.15 (2021-05-27)
 ### Changed
 - change Logs
