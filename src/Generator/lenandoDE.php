@@ -27,15 +27,14 @@ class lenandoDE extends CSVPluginGenerator
     use Loggable;
 	
 	
-	const RAKUTEN_DE = 106.00;
+    const LENANDO_DE = 106.00;
     const PROPERTY_TYPE_ENERGY_CLASS       = 'energy_efficiency_class';
     const PROPERTY_TYPE_ENERGY_CLASS_GROUP = 'energy_efficiency_class_group';
     const PROPERTY_TYPE_ENERGY_CLASS_UNTIL = 'energy_efficiency_class_until';
 	
 	
-	const CHARACTER_TYPE_ENERGY_EFFICIENCY_CLASS	= 'energy_efficiency_class';
+    const CHARACTER_TYPE_ENERGY_EFFICIENCY_CLASS	= 'energy_efficiency_class';
 	
-    const LENANDO_DE = 116.00;
     const DELIMITER = ";";
 	
     const STATUS_VISIBLE = 1;
@@ -70,7 +69,7 @@ class lenandoDE extends CSVPluginGenerator
 	 * @var ElasticExportItemHelper
 	 */
 	private $elasticExportItemHelper;
-	
+
     /**
      * @var ArrayHelper
      */
@@ -550,14 +549,41 @@ class lenandoDE extends CSVPluginGenerator
      */
     private function getBasePriceComponentList($variation):array
     {
-        $unit = $this->getUnit($variation);
-        $content = (float)$variation['data']['unit']['content'];
-        $convertBasePriceContentTag = $this->elasticExportHelper->getConvertContentTag($content, 3);
-        if ($convertBasePriceContentTag == true && strlen($unit))
-        {
-            $content = $this->elasticExportHelper->getConvertedBasePriceContent($content, $unit);
-            $unit = $this->elasticExportHelper->getConvertedBasePriceUnit($unit);
-        }
+            
+	 if((int)$variation['data']['unit']['id'] <= 52){
+	    
+		 //plentymarkets erstellte Units
+		$unit = $this->getUnit($variation);
+		$content = (float)$variation['data']['unit']['content'];
+		$convertBasePriceContentTag = $this->elasticExportHelper->getConvertContentTag($content, 3);
+		if ($convertBasePriceContentTag == true && strlen($unit))
+		{
+		    $content = $this->elasticExportHelper->getConvertedBasePriceContent($content, $unit);
+		    $unit = $this->elasticExportHelper->getConvertedBasePriceUnit($unit);
+		}
+	    
+	 }else{
+		 
+		 //eigen erstelle Units
+		$priceList = $this->elasticExportPriceHelper->getPriceList($variation, $settings, 2, '.');
+		$basePriceData = $this->elasticExportPriceHelper->getBasePriceDetails($variation, (float) $priceList['price'], $settings->get('lang'));
+
+
+		if((string)$basePriceData['unitLongName'] !== ''){
+
+			$unitName = $basePriceData['unitLongName'];
+			$unitContent = number_format((float)$variation['data']['unit']['content'],3,',','');
+
+		}else{
+
+			$unitName = '';
+			$unitContent = '';
+
+		}
+	    
+	 }
+	    
+	    
         return array(
             'content'   =>  $content,
             'unit'      =>  $unit,
@@ -576,115 +602,116 @@ class lenandoDE extends CSVPluginGenerator
     {
         switch((int) $variation['data']['unit']['id'])
         {
-            case '1':
-				return 'Stück';
-			case '2':
-				return 'kg';
-			case '3':
-				return 'g';
-			case '4':
-				return 'mg';
-			case '5':
-				return 'l';
-			case '6':
-				return '12 Stück';
-			case '7':
-				return '2er Pack';
-			case '8':
-				return 'Ballen';
-			case '9':
-				return 'Behälter';
-			case '10':
-				return 'Beutel';
-			case '11':
-				return 'Blatt';
-			case '12':
-				return 'Block';
-			case '13':
-				return 'Block';
-			case '14':
-				return 'Bogen';
-			case '15':
-				return 'Box';
-			case '16':
-				return 'Bund';
-			case '17':
-				return 'Container';
-			case '18':
-				return 'Dose';
-			case '19':
-				return 'Dose/Büchse';
-			case '20':
-				return 'Dutzend';
-			case '21':
-				return 'Eimer';
-			case '22':
-				return 'Etui';
-			case '23':
-				return 'Fass';
-			case '24':
-				return 'Flasche';
-			case '25':
-				return 'Flüssigunze';
-			case '26':
-				return 'Glas/Gefäß';
-			case '27':
-				return 'Karton';
-			case '28':
-				return 'Kartonage';
-			case '29':
-				return 'Kit';
-			case '30':
-				return 'Knäuel';
-			case '31':
-				return 'm';
-			case '32':
-				return 'ml';
-			case '33':
-				return 'mm';
-			case '34':
-				return 'Paar';
-			case '35':
-				return 'Päckchen';
-			case '36':
-				return 'Paket';
-			case '37':
-				return 'Palette';
-			case '38':
-				return 'm²';
-			case '39':
-				return 'cm²';
-			case '40':
-				return 'mm²';
-			case '41':
-				return 'cm²';
-			case '42':
-				return 'mm²';
-			case '43':
-				return 'Rolle';
-			case '44':
-				return 'Sack';
-			case '45':
-				return 'Satz';
-			case '46':
-				return 'Spule';
-			case '47':
-				return 'Stück';
-			case '48':
-				return 'Tube/Rohr';
-			case '49':
-				return 'Unze';
-			case '50':
-				return 'Wascheinheit';
-			case '51':
-				return 'cm';
-			case '52':
-				return 'Zoll';
-			
-			default:
-				return '';
+		case '1':
+			return 'Stück';
+		case '2':
+			return 'kg';
+		case '3':
+			return 'g';
+		case '4':
+			return 'mg';
+		case '5':
+			return 'l';
+		case '6':
+			return '12 Stück';
+		case '7':
+			return '2er Pack';
+		case '8':
+			return 'Ballen';
+		case '9':
+			return 'Behälter';
+		case '10':
+			return 'Beutel';
+		case '11':
+			return 'Blatt';
+		case '12':
+			return 'Block';
+		case '13':
+			return 'Block';
+		case '14':
+			return 'Bogen';
+		case '15':
+			return 'Box';
+		case '16':
+			return 'Bund';
+		case '17':
+			return 'Container';
+		case '18':
+			return 'Dose';
+		case '19':
+			return 'Dose/Büchse';
+		case '20':
+			return 'Dutzend';
+		case '21':
+			return 'Eimer';
+		case '22':
+			return 'Etui';
+		case '23':
+			return 'Fass';
+		case '24':
+			return 'Flasche';
+		case '25':
+			return 'Flüssigunze';
+		case '26':
+			return 'Glas/Gefäß';
+		case '27':
+			return 'Karton';
+		case '28':
+			return 'Kartonage';
+		case '29':
+			return 'Kit';
+		case '30':
+			return 'Knäuel';
+		case '31':
+			return 'm';
+		case '32':
+			return 'ml';
+		case '33':
+			return 'mm';
+		case '34':
+			return 'Paar';
+		case '35':
+			return 'Päckchen';
+		case '36':
+			return 'Paket';
+		case '37':
+			return 'Palette';
+		case '38':
+			return 'm²';
+		case '39':
+			return 'cm²';
+		case '40':
+			return 'mm²';
+		case '41':
+			return 'cm²';
+		case '42':
+			return 'mm²';
+		case '43':
+			return 'Rolle';
+		case '44':
+			return 'Sack';
+		case '45':
+			return 'Satz';
+		case '46':
+			return 'Spule';
+		case '47':
+			return 'Stück';
+		case '48':
+			return 'Tube/Rohr';
+		case '49':
+			return 'Unze';
+		case '50':
+			return 'Wascheinheit';
+		case '51':
+			return 'cm';
+		case '52':
+			return 'Zoll';
+
+		default:
+			return '';
         }
     }
+	
     /**
      * Get the item value for the store special flag.
      *
