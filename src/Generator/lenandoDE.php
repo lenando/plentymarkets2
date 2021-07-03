@@ -557,12 +557,8 @@ class lenandoDE extends CSVPluginGenerator
 		$unit = $this->getUnit($variation);
 		$content = (float)$variation['data']['unit']['content'];
 		$convertBasePriceContentTag = $this->elasticExportHelper->getConvertContentTag($content, 3);
-		if ($convertBasePriceContentTag == true && strlen($unit))
-		{
-		    $content = $this->elasticExportHelper->getConvertedBasePriceContent($content, $unit);
-		    $unit = $this->elasticExportHelper->getConvertedBasePriceUnit($unit);
-		}
-	    
+		
+	
 	 }else{
 		 
 		 //eigen erstelle Units
@@ -581,8 +577,14 @@ class lenandoDE extends CSVPluginGenerator
 			$content = '';
 
 		}
-	    
+		
 	 }
+	 $convertBasePriceContentTag = $this->elasticExportHelper->getConvertContentTag($content, 3);
+	if ($convertBasePriceContentTag == true && strlen($unit))
+	{
+	    $content = $this->elasticExportHelper->getConvertedBasePriceContent($content, $unit);
+	    $unit = $this->elasticExportHelper->getConvertedBasePriceUnit($unit);
+	}
 	    
 	    
         return array(
