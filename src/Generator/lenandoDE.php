@@ -26,7 +26,7 @@ class lenandoDE extends CSVPluginGenerator
 {
     use Loggable;
 	
-	
+    const RAKUTEN_DE = 106.00;
     const LENANDO_DE = 106.00;
     const PROPERTY_TYPE_ENERGY_CLASS       = 'energy_efficiency_class';
     const PROPERTY_TYPE_ENERGY_CLASS_GROUP = 'energy_efficiency_class_group';
