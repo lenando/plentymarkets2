@@ -569,7 +569,7 @@ class lenandoDE extends CSVPluginGenerator
 		if((string)$basePriceData['unitLongName'] !== ''){
 
 			$unit = $basePriceData['unitLongName'];
-			$content = number_format((float)$variation['data']['unit']['content'],3,',','');
+			$content = number_format((float)$basePriceData['unitContent'],3,',','');//number_format((float)$variation['data']['unit']['content'],3,',','');
 
 		}else{
 
