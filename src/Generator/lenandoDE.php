@@ -409,7 +409,7 @@ class lenandoDE extends CSVPluginGenerator
             $effizienzklasse = str_replace("9", "F",$effizienzklasse);
             $effizienzklasse = str_replace("10", "G",$effizienzklasse);
             
-            $basePriceComponentList = $this->getBasePriceComponentList($variation);
+            $basePriceComponentList = $this->getBasePriceComponentList($variation,$settings);
             
            
             
@@ -548,7 +548,7 @@ class lenandoDE extends CSVPluginGenerator
      * @param array $item
      * @return array
      */
-    private function getBasePriceComponentList($variation):array
+    private function getBasePriceComponentList($variation,$settings):array
     {
             
 	 if((int)$variation['data']['unit']['id'] <= 52){
@@ -572,13 +572,13 @@ class lenandoDE extends CSVPluginGenerator
 
 		if((string)$basePriceData['unitLongName'] !== ''){
 
-			$unitName = $basePriceData['unitLongName'];
-			$unitContent = number_format((float)$variation['data']['unit']['content'],3,',','');
+			$unit = $basePriceData['unitLongName'];
+			$content = number_format((float)$variation['data']['unit']['content'],3,',','');
 
 		}else{
 
-			$unitName = '';
-			$unitContent = '';
+			$unit = '';
+			$content = '';
 
 		}
 	    
