@@ -1,5 +1,9 @@
 # Release Notes for Elastic Export lenando.de
 
+## v1.0.18 (2022-07-01)
+### geändert
+- php 8 compatibility
+
 ## v1.0.17 (2021-07-02)
 ### geändert
 - Units change to ID's again.
