@@ -1,6 +1,6 @@
 # Release Notes für Elastic Export lenando.de
 
-## v1.0.17 (2022-07-01)
+## v1.0.18 (2022-07-01)
 ### geändert
 - php 8 kompatibilität
 
